@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1",
+    "title": "KINETIC",
+    "role": "Interactive UI",
+    "image": "/assets/kinetic.png",
+    "url": "https://github.com/oscaralfredoperezlara"
+  },
+  {
+    "id": "2",
+    "title": "VOID",
+    "role": "Brutalist WebGL",
+    "image": "/assets/void.png",
+    "url": "https://github.com/oscaralfredoperezlara"
+  },
+  {
+    "id": "3",
+    "title": "AURA",
+    "role": "Holographic Experience",
+    "image": "/assets/aura.png",
+    "url": "https://github.com/oscaralfredoperezlara"
+  }
+]

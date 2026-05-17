@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OSLR | Cinematic Realities</title>
+    <!-- Splitting.css for text animations -->
+    <link rel="stylesheet" href="https://unpkg.com/splitting/dist/splitting.css" />
+    <link rel="stylesheet" href="https://unpkg.com/splitting/dist/splitting-cells.css" />
+  </head>
+  <body>
+    <!-- WebGL Background -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Hover images are dynamically injected by Showcase.js -->
+    <!-- Custom Cursor -->
+    <div class="custom-cursor" id="cursor"></div>
+
+    <!-- Preloader (Split Screen) -->
+    <div class="preloader" id="preloader">
+      <div class="preloader-panel panel-top"></div>
+      <div class="preloader-panel panel-bottom"></div>
+      <div class="preloader-content">
+        <div class="preloader-counter" id="preloader-counter">000</div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-header">
+      <div class="logo magnetic" data-magnetic>OSLR.SYS</div>
+      <div class="nav-links">
+        <a href="#work" class="magnetic" data-magnetic>Work</a>
+        <a href="/about.html" class="magnetic" data-magnetic>About</a>
+        <a href="/admin.html" class="magnetic" data-magnetic style="opacity: 0.3;">Admin</a>
+        <a href="https://wa.me/528331119884" target="_blank" class="magnetic" data-magnetic style="color: #25D366; font-weight:bold;">WhatsApp</a>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="smooth-wrapper">
+      <div id="smooth-content">
+        
+        <!-- Hero Section -->
+        <section class="hero">
+          <div class="hero-content">
+            <h1 class="hero-massive" data-splitting>OSLR</h1>
+            <p class="hero-subtitle" data-splitting>
+              Front-End Engineer & Creative Director. Crafting premium digital voids and cinematic web experiences.
+            </p>
+          </div>
+        </section>
+
+        <!-- Showcase Section (Dynamic List) -->
+        <section class="showcase" id="work">
+          <div class="showcase-list" id="dynamic-showcase">
+            <!-- Injected by Showcase.js -->
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-roboto-mono);
+  --font-display: var(--font-space-grotesk);
+
+  --color-void: #050505;
+  --color-glass: rgba(255, 255, 255, 0.05);
+}
+
+@layer base {
+  * {
+    cursor: none !important;
+  }
+  
+  body {
+    background-color: var(--color-void);
+    color: white;
+    overflow-x: hidden;
+    font-family: var(--font-sans);
+  }
+
+  ::selection {
+    background: white;
+    color: black;
+  }
+}
+
+@layer components {
+  /* Custom Cursor */
+  .custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: white;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                height 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, width, height;
+  }
+
+  .custom-cursor.hover {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    mix-blend-mode: normal;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Massive Text */
+  .text-massive {
+    font-family: var(--font-display);
+    font-size: clamp(6rem, 20vw, 25rem);
+    font-weight: 700;
+    line-height: 0.8;
+    text-transform: uppercase;
+    letter-spacing: -0.06em;
+  }
+  
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Lenis Recommended */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
