@@ -7,8 +7,9 @@ import { useRef, useState, useMemo } from "react";
 function Starfield() {
   const ref = useRef<THREE.Points>(null);
   const [sphere] = useState(() => {
-    const positions = new Float32Array(3000 * 3);
-    for (let i = 0; i < 3000; i++) {
+    const count = 2000;
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
       const r = 20 * Math.cbrt(Math.random());
       const theta = Math.random() * 2 * Math.PI;
       const phi = Math.acos(2 * Math.random() - 1);
@@ -38,7 +39,11 @@ function Starfield() {
 export function WebGLBackground() {
   return (
     <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none">
-      <Canvas camera={{ position: [0, 0, 1] }}>
+      <Canvas 
+        camera={{ position: [0, 0, 1] }}
+        dpr={[1, 1.5]}
+        gl={{ powerPreference: "high-performance", antialias: false }}
+      >
         <fog attach="fog" args={["#050505", 1, 15]} />
         <Starfield />
       </Canvas>

@@ -41,21 +41,33 @@ export function FooterSection() {
       }
     });
 
-    // Pure interactivity: Mouse movement tracking
+    // Pure interactivity: Mouse movement tracking with cached dimensions to avoid layout thrashing
     const xTo = gsap.quickTo(bgRef.current, "x", { duration: 0.8, ease: "power3" });
     const yTo = gsap.quickTo(bgRef.current, "y", { duration: 0.8, ease: "power3" });
 
+    let rect = container.current?.getBoundingClientRect();
+
+    const handleResize = () => {
+      if (container.current) {
+        rect = container.current.getBoundingClientRect();
+      }
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (!container.current) return;
-      const { left, top, width, height } = container.current.getBoundingClientRect();
-      const x = (e.clientX - left - width / 2) * 0.05; // 5% movement multiplier
-      const y = (e.clientY - top - height / 2) * 0.05;
+      if (!rect) return;
+      const x = (e.clientX - rect.left - rect.width / 2) * 0.05; // 5% movement multiplier
+      const y = (e.clientY - rect.top - rect.height / 2) * 0.05;
       xTo(x);
       yTo(y);
     };
 
+    window.addEventListener("resize", handleResize);
     container.current?.addEventListener("mousemove", handleMouseMove);
-    return () => container.current?.removeEventListener("mousemove", handleMouseMove);
+    
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      container.current?.removeEventListener("mousemove", handleMouseMove);
+    };
 
   }, { scope: container });
 
