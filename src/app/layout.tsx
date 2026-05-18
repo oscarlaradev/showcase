@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { ReactLenis } from 'lenis/react';
 import { CustomCursor } from "@/components/CustomCursor";
+import { AudioPlayer } from "@/components/AudioPlayer";
 import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className="antialiased bg-black selection:bg-white selection:text-black">
         <ReactLenis root options={{ lerp: 0.05, smoothWheel: true }}>
           <CustomCursor />
+          <AudioPlayer />
           {/* Navigation */}
           <nav className="fixed top-0 left-0 w-full p-8 flex justify-between items-center z-50 mix-blend-difference">
             <div className="font-display font-bold text-2xl tracking-tighter uppercase" data-magnetic>
