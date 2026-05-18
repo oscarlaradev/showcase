@@ -110,7 +110,24 @@ export default function AdminPage() {
           <h1 className="text-2xl font-display font-bold mb-6 tracking-tighter">{editingId ? "MODIFICAR MATRIZ" : "SUBIR AL VACÍO"}</h1>
           <input type="text" placeholder="Título (ej. NEON)" required value={title} onChange={(e) => setTitle(e.target.value)} className="w-full p-3 mb-4 bg-transparent border border-white/20 rounded focus:border-white outline-none" />
           <input type="text" placeholder="Rol (ej. UI/UX)" required value={role} onChange={(e) => setRole(e.target.value)} className="w-full p-3 mb-4 bg-transparent border border-white/20 rounded focus:border-white outline-none" />
-          <input type="text" placeholder="URL de Imagen (ej. /assets/neon.png)" required value={image} onChange={(e) => setImage(e.target.value)} className="w-full p-3 mb-4 bg-transparent border border-white/20 rounded focus:border-white outline-none" />
+          
+          <input type="text" placeholder="Enlace o Ruta de Imagen (ej. https://... o /assets/...)" required value={image} onChange={(e) => setImage(e.target.value)} className="w-full p-3 mb-4 bg-transparent border border-white/20 rounded focus:border-white outline-none" />
+          
+          {/* Live Image Preview */}
+          {image && (
+            <div className="mb-4 p-3 border border-white/10 bg-black/40 rounded flex flex-col items-center gap-2">
+              <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest">Vista previa del enlace</span>
+              <img 
+                src={image} 
+                alt="Vista previa" 
+                className="max-h-28 max-w-full rounded object-contain border border-white/10"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=256";
+                }}
+              />
+            </div>
+          )}
+
           <input type="text" placeholder="URL Externa (ej. https://...)" value={url} onChange={(e) => setUrl(e.target.value)} className="w-full p-3 mb-4 bg-transparent border border-white/20 rounded focus:border-white outline-none" />
           
           <div className="flex gap-4">
@@ -130,12 +147,24 @@ export default function AdminPage() {
       <div className="flex flex-col gap-4">
         <h2 className="text-2xl font-display font-bold mb-2 tracking-tighter">PROYECTOS ACTIVOS</h2>
         {projects.map(p => (
-          <div key={p.id} className="p-4 border border-white/10 bg-black rounded flex justify-between items-center">
-            <div>
-              <h3 className="font-bold text-lg">{p.title}</h3>
-              <p className="text-sm text-gray-500">{p.role}</p>
+          <div key={p.id} className="p-4 border border-white/10 bg-black rounded flex justify-between items-center gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-12 bg-white/5 border border-white/10 rounded overflow-hidden flex-shrink-0">
+                <img 
+                  src={p.image} 
+                  alt={p.title} 
+                  className="w-full h-full object-cover" 
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=256";
+                  }}
+                />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg leading-tight">{p.title}</h3>
+                <p className="text-sm text-gray-500">{p.role}</p>
+              </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-shrink-0">
               <button onClick={() => handleEdit(p)} className="px-3 py-1 border border-white/20 text-xs hover:bg-white hover:text-black">EDITAR</button>
               <button onClick={() => handleDelete(p.id!)} className="px-3 py-1 border border-red-500 text-red-500 text-xs hover:bg-red-500 hover:text-white">BORRAR</button>
             </div>
