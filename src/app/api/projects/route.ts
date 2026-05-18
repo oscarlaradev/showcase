@@ -5,11 +5,64 @@ import { jwtVerify } from "jose";
 
 const SECRET_KEY = new TextEncoder().encode("oslr_ultra_secure_jwt_key_2026");
 
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+// Helper to fetch projects with Upstash Redis or local JSON fallback
+async function getProjects(): Promise<any[]> {
+  if (REDIS_URL && REDIS_TOKEN) {
+    try {
+      const res = await fetch(`${REDIS_URL}/get/projects`, {
+        headers: { Authorization: `Bearer ${REDIS_TOKEN}` },
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.result) {
+          return JSON.parse(data.result);
+        }
+      }
+    } catch (e) {
+      console.error("Redis GET projects error, falling back to local file:", e);
+    }
+  }
+
+  // Local JSON fallback
+  const filePath = path.join(process.cwd(), "src/data/projects.json");
+  const fileContents = await fs.readFile(filePath, "utf8");
+  return JSON.parse(fileContents);
+}
+
+// Helper to save projects with Upstash Redis or local JSON fallback
+async function saveProjects(projects: any[]): Promise<void> {
+  if (REDIS_URL && REDIS_TOKEN) {
+    try {
+      const res = await fetch(REDIS_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${REDIS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(["SET", "projects", JSON.stringify(projects)]),
+      });
+      if (res.ok) {
+        return;
+      }
+      throw new Error(`Upstash returned status ${res.status}`);
+    } catch (e) {
+      console.error("Redis SET projects error, falling back to local file:", e);
+    }
+  }
+
+  // Local JSON fallback
+  const filePath = path.join(process.cwd(), "src/data/projects.json");
+  await fs.writeFile(filePath, JSON.stringify(projects, null, 2));
+}
+
 export async function GET() {
   try {
-    const filePath = path.join(process.cwd(), "src/data/projects.json");
-    const fileContents = await fs.readFile(filePath, "utf8");
-    return NextResponse.json(JSON.parse(fileContents));
+    const projects = await getProjects();
+    return NextResponse.json(projects);
   } catch (e) {
     return NextResponse.json({ error: "Failed to read projects" }, { status: 500 });
   }
@@ -26,13 +79,10 @@ export async function POST(req: Request) {
     const newProject = await req.json();
     newProject.id = Date.now().toString();
 
-    const filePath = path.join(process.cwd(), "src/data/projects.json");
-    const fileContents = await fs.readFile(filePath, "utf8");
-    const projects = JSON.parse(fileContents);
-    
+    const projects = await getProjects();
     projects.push(newProject);
     
-    await fs.writeFile(filePath, JSON.stringify(projects, null, 2));
+    await saveProjects(projects);
 
     return NextResponse.json({ success: true, project: newProject });
   } catch (e: any) {
@@ -52,12 +102,10 @@ export async function DELETE(req: Request) {
     const id = url.searchParams.get("id");
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
-    const filePath = path.join(process.cwd(), "src/data/projects.json");
-    const fileContents = await fs.readFile(filePath, "utf8");
-    let projects = JSON.parse(fileContents);
-    
+    let projects = await getProjects();
     projects = projects.filter((p: any) => p.id !== id);
-    await fs.writeFile(filePath, JSON.stringify(projects, null, 2));
+    
+    await saveProjects(projects);
 
     return NextResponse.json({ success: true });
   } catch (e: any) {
@@ -76,12 +124,10 @@ export async function PUT(req: Request) {
     const updatedProject = await req.json();
     if (!updatedProject.id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
-    const filePath = path.join(process.cwd(), "src/data/projects.json");
-    const fileContents = await fs.readFile(filePath, "utf8");
-    let projects = JSON.parse(fileContents);
-    
+    let projects = await getProjects();
     projects = projects.map((p: any) => p.id === updatedProject.id ? updatedProject : p);
-    await fs.writeFile(filePath, JSON.stringify(projects, null, 2));
+    
+    await saveProjects(projects);
 
     return NextResponse.json({ success: true });
   } catch (e: any) {
