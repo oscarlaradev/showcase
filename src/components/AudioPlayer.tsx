@@ -7,7 +7,7 @@ export function AudioPlayer() {
   const [hasInteracted, setHasInteracted] = useState(false);
 
   useEffect(() => {
-    // Create audio instance
+    // Create audio instance exactly once on mount
     const audio = new Audio("/assets/musica.mp3");
     audio.loop = true;
     audio.volume = 0.25; // Clean, atmospheric ambient volume level
@@ -15,7 +15,10 @@ export function AudioPlayer() {
 
     // Autoplay on first user interaction to bypass browser restrictions
     const startAudioOnInteraction = () => {
-      if (audioRef.current && audioRef.current.paused && !hasInteracted) {
+      // Remove listeners on the very first interaction event
+      cleanupListeners();
+
+      if (audioRef.current && audioRef.current.paused) {
         audioRef.current.play()
           .then(() => {
             setIsPlaying(true);
@@ -25,7 +28,6 @@ export function AudioPlayer() {
             console.log("Autoplay blocked by browser policy, waiting for direct user click.", err);
           });
       }
-      cleanupListeners();
     };
 
     const cleanupListeners = () => {
@@ -43,7 +45,7 @@ export function AudioPlayer() {
       audio.pause();
       audioRef.current = null;
     };
-  }, [hasInteracted]);
+  }, []);
 
   const togglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
