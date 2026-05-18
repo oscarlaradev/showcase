@@ -35,8 +35,9 @@ export async function POST(req: Request) {
     await fs.writeFile(filePath, JSON.stringify(projects, null, 2));
 
     return NextResponse.json({ success: true, project: newProject });
-  } catch (e) {
-    return NextResponse.json({ error: "Failed to save project" }, { status: 500 });
+  } catch (e: any) {
+    console.error("POST PROJECT ERROR:", e);
+    return NextResponse.json({ error: "Failed to save project", details: e?.message }, { status: 500 });
   }
 }
 
@@ -59,8 +60,9 @@ export async function DELETE(req: Request) {
     await fs.writeFile(filePath, JSON.stringify(projects, null, 2));
 
     return NextResponse.json({ success: true });
-  } catch (e) {
-    return NextResponse.json({ error: "Failed to delete project" }, { status: 500 });
+  } catch (e: any) {
+    console.error("DELETE PROJECT ERROR:", e);
+    return NextResponse.json({ error: "Failed to delete project", details: e?.message }, { status: 500 });
   }
 }
 
@@ -82,7 +84,8 @@ export async function PUT(req: Request) {
     await fs.writeFile(filePath, JSON.stringify(projects, null, 2));
 
     return NextResponse.json({ success: true });
-  } catch (e) {
-    return NextResponse.json({ error: "Failed to update project" }, { status: 500 });
+  } catch (e: any) {
+    console.error("PUT PROJECT ERROR:", e);
+    return NextResponse.json({ error: "Failed to update project", details: e?.message }, { status: 500 });
   }
 }

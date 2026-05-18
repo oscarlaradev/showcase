@@ -63,7 +63,12 @@ export default function AdminPage() {
       setTitle(""); setRole(""); setImage(""); setUrl(""); setEditingId(null);
       fetchProjects();
     } else {
-      setMessage("Error al guardar el proyecto.");
+      try {
+        const errorData = await res.json();
+        setMessage(`Error: ${errorData.error || "No se pudo guardar"} (${errorData.details || "Código de error " + res.status})`);
+      } catch (err) {
+        setMessage(`Error al guardar el proyecto (Código ${res.status}).`);
+      }
     }
   };
 
