@@ -11,6 +11,7 @@ type Project = {
   title: string;
   role: string;
   image: string;
+  url?: string;
 };
 
 export function ShowcaseSection() {
