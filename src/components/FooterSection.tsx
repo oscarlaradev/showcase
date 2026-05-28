@@ -7,99 +7,126 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export function FooterSection() {
-  const container = useRef<HTMLElement>(null);
-  const textRef = useRef<HTMLHeadingElement>(null);
-  const bgRef = useRef<HTMLImageElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const textRef    = useRef<HTMLHeadingElement>(null);
+  const lineRef    = useRef<HTMLDivElement>(null);
+  const ctaRef     = useRef<HTMLDivElement>(null);
+  const bgImgRef   = useRef<HTMLImageElement>(null);
 
   useGSAP(() => {
-    // Scroll reveal animation for text
-    gsap.fromTo(textRef.current, 
-      { yPercent: 50, scale: 0.8, opacity: 0 },
-      { 
-        yPercent: 0, 
-        scale: 1, 
-        opacity: 1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: container.current,
-          start: "top bottom",
-          end: "bottom bottom",
-          scrub: true
-        }
+    // Big text parallax reveal
+    gsap.fromTo(textRef.current,
+      { yPercent: 45, opacity: 0, scale: 0.92 },
+      {
+        yPercent: 0, opacity: 1, scale: 1, ease: "power3.out",
+        scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "center center", scrub: true },
       }
     );
 
-    // Subtle parallax on scroll for background
-    gsap.to(bgRef.current, {
-      yPercent: 20,
-      ease: "none",
-      scrollTrigger: {
-        trigger: container.current,
-        start: "top bottom",
-        end: "bottom top",
-        scrub: true
+    // CTA fade in
+    gsap.fromTo(ctaRef.current,
+      { opacity: 0, y: 24 },
+      {
+        opacity: 1, y: 0, duration: 0.9, ease: "power3.out",
+        scrollTrigger: { trigger: sectionRef.current, start: "top center", toggleActions: "play none none reverse" },
       }
+    );
+
+    // Expanding line
+    gsap.fromTo(lineRef.current,
+      { scaleX: 0 },
+      {
+        scaleX: 1, duration: 1, ease: "power3.out",
+        scrollTrigger: { trigger: sectionRef.current, start: "top center", toggleActions: "play none none reverse" },
+      }
+    );
+
+    // Background parallax + mouse drift
+    const xTo = gsap.quickTo(bgImgRef.current, "x", { duration: 1.0, ease: "power3" });
+    const yTo = gsap.quickTo(bgImgRef.current, "y", { duration: 1.0, ease: "power3" });
+
+    // Scroll parallax
+    gsap.to(bgImgRef.current, {
+      yPercent: 18, ease: "none",
+      scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: true },
     });
 
-    // Pure interactivity: Mouse movement tracking with cached dimensions to avoid layout thrashing
-    const xTo = gsap.quickTo(bgRef.current, "x", { duration: 0.8, ease: "power3" });
-    const yTo = gsap.quickTo(bgRef.current, "y", { duration: 0.8, ease: "power3" });
-
-    let rect = container.current?.getBoundingClientRect();
-
-    const handleResize = () => {
-      if (container.current) {
-        rect = container.current.getBoundingClientRect();
-      }
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
+    // Mouse parallax
+    const onMove = (e: MouseEvent) => {
+      const rect = sectionRef.current?.getBoundingClientRect();
       if (!rect) return;
-      const x = (e.clientX - rect.left - rect.width / 2) * 0.05; // 5% movement multiplier
-      const y = (e.clientY - rect.top - rect.height / 2) * 0.05;
-      xTo(x);
-      yTo(y);
+      xTo((e.clientX - rect.left - rect.width  / 2) * 0.045);
+      yTo((e.clientY - rect.top  - rect.height / 2) * 0.045);
     };
+    sectionRef.current?.addEventListener("mousemove", onMove);
+    return () => sectionRef.current?.removeEventListener("mousemove", onMove);
 
-    window.addEventListener("resize", handleResize);
-    container.current?.addEventListener("mousemove", handleMouseMove);
-    
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      container.current?.removeEventListener("mousemove", handleMouseMove);
-    };
-
-  }, { scope: container });
+  }, { scope: sectionRef });
 
   return (
-    <footer ref={container} className="relative w-full h-screen bg-black text-white flex flex-col justify-end items-center pb-8 overflow-hidden z-20">
-      
-      {/* Interactive Background Image */}
-      <div className="absolute inset-0 w-full h-full opacity-60 pointer-events-none overflow-hidden flex items-center justify-center">
-        <img 
-          ref={bgRef} 
-          src="/assets/footer-bg.png" 
-          alt="Void Artifact" 
-          className="w-[120%] h-[120%] object-cover mix-blend-screen scale-110"
+    <footer
+      ref={sectionRef}
+      className="relative w-full min-h-screen bg-[#080808] text-white flex flex-col justify-between items-center overflow-hidden z-20 pt-16 pb-10"
+    >
+      {/* ── Background image ────────────────────────────────── */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <img
+          ref={bgImgRef}
+          src="/assets/footer-bg.png"
+          alt=""
+          aria-hidden
+          className="w-[118%] h-[118%] object-cover mix-blend-screen opacity-45 will-change-transform"
+          style={{ marginLeft: "-9%", marginTop: "-9%" }}
         />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, #080808 0%, transparent 20%, transparent 70%, #080808 100%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to right, #080808 0%, transparent 20%, transparent 80%, #080808 100%)" }} />
       </div>
 
-      <div className="absolute top-8 w-full px-8 flex justify-between font-mono text-xs uppercase tracking-widest z-10">
-        <span>© 2026 OSLR.SYS</span>
-        <span>Basado en el Vacío</span>
+      {/* Dot grid overlay */}
+      <div className="absolute inset-0 dot-grid opacity-[0.07] pointer-events-none z-0" />
+
+      {/* ── Top meta bar ───────────────────────────────────── */}
+      <div className="relative z-10 w-full px-8 md:px-14 flex flex-wrap justify-between gap-2">
+        <span className="hud-label">© 2026 OSCAR LARA</span>
+        <span className="hud-label hidden md:block">DISEÑO Y DESARROLLO DIGITAL · MÉXICO</span>
+        <span className="hud-label">TODOS LOS DERECHOS RESERVADOS</span>
       </div>
-      
-      <h2 ref={textRef} className="font-display font-bold text-[13vw] leading-none tracking-tighter uppercase mb-8 z-10 text-outline mix-blend-difference" data-magnetic>
-        Hablemos
-      </h2>
-      
-      <div className="flex flex-col md:flex-row gap-4 items-center z-10">
-        <a href="https://wa.me/5218331119884" target="_blank" rel="noreferrer" className="px-8 py-4 bg-white text-black font-mono uppercase tracking-widest text-sm hover:bg-gray-200 transition-colors" data-magnetic>
+
+      {/* ── Expanding line ─────────────────────────────────── */}
+      <div
+        ref={lineRef}
+        className="relative z-10 w-full h-[1px] mt-5 origin-left"
+        style={{ background: "linear-gradient(to right, transparent, rgba(216,191,197,0.18), transparent)" }}
+      />
+
+      {/* ── Big CTA text ───────────────────────────────────── */}
+      <div className="relative z-10 flex-1 flex flex-col justify-center items-center text-center px-6 gap-4">
+        <span className="hud-label text-[#D8BFC5]/45 tracking-[0.4em]">Iniciemos la Colaboración</span>
+        <h2
+          ref={textRef}
+          className="text-huge font-display font-bold uppercase text-outline select-none"
+          data-magnetic
+        >
+          Hablemos
+        </h2>
+      </div>
+
+      {/* ── CTA Buttons ────────────────────────────────────── */}
+      <div ref={ctaRef} className="relative z-10 flex flex-col md:flex-row gap-3 px-8 pb-5 opacity-0">
+        <a href="https://wa.me/5218331119884" target="_blank" rel="noreferrer" className="btn-primary" data-magnetic>
           WhatsApp Directo
+          <span>→</span>
         </a>
-        <a href="mailto:oscarserafin201@gmail.com" className="px-8 py-4 bg-transparent border border-white text-white font-mono uppercase tracking-widest text-sm hover:bg-white hover:text-black transition-colors" data-magnetic>
+        <a href="mailto:oscarserafin201@gmail.com" className="btn-ghost" data-magnetic>
           Enviar Email
         </a>
+      </div>
+
+      {/* ── Bottom credits ─────────────────────────────────── */}
+      <div className="relative z-10 w-full px-8 md:px-14 flex flex-wrap justify-between gap-y-1 pt-5 border-t border-white/[0.04]">
+        <span className="hud-label">OSCAR ALFREDO PÉREZ LARA</span>
+        <span className="hud-label hidden md:block">UAT · TAMAULIPAS, MÉXICO</span>
+        <span className="hud-label">PORTFOLIO V2.0</span>
       </div>
     </footer>
   );
